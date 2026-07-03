@@ -1,8 +1,14 @@
-# Hackathon 2026 — Transparence des marchés publics par l'IA et l'Open Data
+# Vigie Marchés — Hackathon AN 2026 · Transparence des marchés publics par l'IA et l'Open Data
 
 Prototype **open source** d'aide aux acheteurs publics pour l'analyse des candidatures aux marchés publics :
 agrégation automatique de sources Open Data, vérification de conformité administrative, analyse de documents,
 **score de risque explicable**, tableaux de bord et **rapport d'aide à la décision** — avec transparence et traçabilité.
+
+## Dossier réglementaire du hackathon
+
+Le dossier [hackathon-an-2026/](hackathon-an-2026/) suit la structure imposée par l'organisation :
+- [DEFI.md](hackathon-an-2026/DEFI.md) — fiche du défi (template officiel) ; son contenu alimente la page publique du défi
+- `docs/` et `images/` — **tout document ou image référencé dans DEFI.md doit être placé dans ces deux dossiers**
 
 ## État du projet
 
