@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "parlement": {
+      "type": "http",
+      "url": "https://parlement.tricoteuses.fr/mcp"
+    },
+    "datagouv": {
+      "type": "http",
+      "url": "https://mcp.data.gouv.fr/mcp"
+    },
+    "justicelibre": {
+      "type": "http",
+      "url": "https://justicelibre.org/mcp"
+    },
+    "service-public": {
+      "type": "http",
+      "url": "https://mcp-service-public.nhaultcoeur.workers.dev/mcp"
+    }
+  }
+}
