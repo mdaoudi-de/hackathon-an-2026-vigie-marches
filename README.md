@@ -15,8 +15,24 @@ Le dossier [hackathon-an-2026/](hackathon-an-2026/) suit la structure imposée p
 - [x] Recensement et **vérification en conditions réelles** de ~80 endpoints / 30 sources (03/07/2026) → [docs/SOURCES.md](docs/SOURCES.md)
 - [x] Initialisation des serveurs MCP du projet → [.mcp.json](.mcp.json)
 - [x] Scripts d'ingestion → base DuckDB locale avec table de provenance → [ingestion/](ingestion/)
-- [ ] Architecture du prototype (pipeline d'analyse, score, dashboard, rapport)
-- [ ] Implémentation
+- [x] Feuille de route par runs → [docs/ROADMAP.md](docs/ROADMAP.md)
+- [x] **Run 1 — Moteur de score explicable** (6 familles de signaux, barème v1.0, CLI) → [vigie/](vigie/)
+- [ ] Run 2 — API FastAPI · Run 3 — Front Next.js · Run 4 — Rapport Claude · Run 5 — MCP maison · Run 6 — Polish
+
+## Moteur d'analyse (Run 1)
+
+```powershell
+.\.venv\Scripts\python -m vigie.cli 552032534          # Danone : VERT, signal HATVP informatif
+.\.venv\Scripts\python -m vigie.cli 75058171200015     # NEOLEDGE : track-record DECP (74 marchés)
+.\.venv\Scripts\python -m vigie.cli 827879610          # DAVEO : ROUGE rédhibitoire (liquidation BODACC)
+.\.venv\Scripts\python -m vigie.cli 552032534 --json   # contrat JSON complet (API/front/MCP)
+.\.venv\Scripts\python -m pytest tests/ -q             # tests de la partie pure
+```
+
+Principes : score **déterministe et explicable** (aucune IA dans le calcul), barème versionné aligné
+sur les interdictions de soumissionner (art. L2141 CCP), **aucun signal sans preuve** (source, URL,
+date, licence), correspondances sanctions toujours « à vérifier » (jamais de rouge automatique sur
+un matching de nom). Cas de démo documentés dans [data/fixtures/cas_demo.md](data/fixtures/cas_demo.md).
 
 ## Ingestion des données
 

@@ -3,8 +3,12 @@
 __pycache__/
 *.pyc
 
-# Données ingérées (volumineuses, régénérables via ingestion/)
-data/
+# Données ingérées (volumineuses, régénérables via ingestion/) — sauf les fixtures de démo
+data/*
+!data/fixtures/
+
+# Secrets
+.env
 
 # Divers
 .DS_Store
