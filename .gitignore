@@ -1,0 +1,11 @@
+# Environnement
+.venv/
+__pycache__/
+*.pyc
+
+# Données ingérées (volumineuses, régénérables via ingestion/)
+data/
+
+# Divers
+.DS_Store
+Thumbs.db
