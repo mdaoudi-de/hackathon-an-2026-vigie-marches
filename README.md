@@ -14,8 +14,43 @@ Le dossier [hackathon-an-2026/](hackathon-an-2026/) suit la structure imposée p
 
 - [x] Recensement et **vérification en conditions réelles** de ~80 endpoints / 30 sources (03/07/2026) → [docs/SOURCES.md](docs/SOURCES.md)
 - [x] Initialisation des serveurs MCP du projet → [.mcp.json](.mcp.json)
+- [x] Scripts d'ingestion → base DuckDB locale avec table de provenance → [ingestion/](ingestion/)
 - [ ] Architecture du prototype (pipeline d'analyse, score, dashboard, rapport)
 - [ ] Implémentation
+
+## Ingestion des données
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\pip install -r requirements.txt
+
+# Tout ingérer (DECP en vue distante = démarrage rapide, rien à télécharger)
+.\.venv\Scripts\python -m ingestion.ingest_all --decp-remote
+
+# Ou en matérialisant les 3,1M de marchés DECP en local (~200 Mo, requêtes instantanées)
+.\.venv\Scripts\python -m ingestion.ingest_all
+
+# À la carte
+.\.venv\Scripts\python -m ingestion.ingest_all --only gels_avoirs edes
+```
+
+Résultat : une base **`data/vigie.duckdb`** avec :
+
+| Table / vue | Contenu | Lignes (03/07/2026) |
+|---|---|---|
+| `gels_avoirs` | Registre national des gels des avoirs (DG Trésor) | 6 292 |
+| `eu_fsf` | Sanctions financières UE (liste consolidée) | 42 347 |
+| `edes` + `os_eu_edes` | Exclusions du budget UE | 3 |
+| `os_worldbank_debarred` | Exclusions Banque mondiale (+ cross-debarment) | 1 415 |
+| `hatvp_representants` / `v_lobbying` | Répertoire HATVP des représentants d'intérêts (3 718 SIREN joignables) | 4 038 |
+| `acheteurs_locaux` / `v_acheteurs` | Annuaire des acheteurs publics locaux (SIREN/SIRET, géoloc) | 37 400 |
+| `communes` | Communes (référentiel partiel Canutes) | 7 504 |
+| `decp` + `v_decp_stats_titulaire` | 3,1M de marchés publics, agrégés par titulaire | 3 101 841 |
+| `_provenance` | **Traçabilité** : source, URL, date de collecte, licence de chaque table | — |
+
+Les fichiers bruts téléchargés sont conservés dans `data/raw/` (auditabilité).
+Les APIs à interroger **par candidat** au moment de l'analyse (recherche-entreprises, BODACC,
+DECP tabulaire, BOAMP, TED) sont disponibles dans [ingestion/clients.py](ingestion/clients.py).
 
 ## Serveurs MCP configurés (aucune clé requise)
 
