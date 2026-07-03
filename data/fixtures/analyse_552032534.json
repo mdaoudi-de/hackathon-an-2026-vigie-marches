@@ -1,0 +1,267 @@
+{
+  "candidat": {
+    "siren": "552032534",
+    "siret": "55203253400703",
+    "denomination": "DANONE",
+    "etat_administratif": "A",
+    "preuve": {
+      "source": "API Recherche d'entreprises (DINUM)",
+      "url": "https://recherche-entreprises.api.gouv.fr/search?q=552032534&page=1&per_page=10",
+      "collecte_le": "2026-07-03",
+      "licence": "Licence Ouverte 2.0",
+      "detail": null
+    }
+  },
+  "score": {
+    "niveau": "VERT",
+    "points": 0,
+    "plafond": 100,
+    "version_bareme": "1.0",
+    "redhibitoire": false,
+    "nb_a_verifier": 0
+  },
+  "familles": [
+    {
+      "id": "identite",
+      "libelle": "Identité et conformité administrative",
+      "points": 0,
+      "plafond": 30,
+      "signaux": [
+        {
+          "id": "identite.existence",
+          "libelle": "Existence dans le répertoire des entreprises",
+          "statut": "ok",
+          "valeur": "DANONE — SIREN 552032534",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "API Recherche d'entreprises (DINUM)",
+            "url": "https://recherche-entreprises.api.gouv.fr/search?q=552032534&page=1&per_page=10",
+            "collecte_le": "2026-07-03",
+            "licence": "Licence Ouverte 2.0",
+            "detail": {
+              "nombre_etablissements": 19
+            }
+          }
+        },
+        {
+          "id": "identite.etat",
+          "libelle": "État administratif",
+          "statut": "ok",
+          "valeur": "Entreprise active",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "API Recherche d'entreprises (DINUM)",
+            "url": "https://recherche-entreprises.api.gouv.fr/search?q=552032534&page=1&per_page=10",
+            "collecte_le": "2026-07-03",
+            "licence": "Licence Ouverte 2.0",
+            "detail": null
+          }
+        },
+        {
+          "id": "identite.anciennete",
+          "libelle": "Ancienneté",
+          "statut": "ok",
+          "valeur": "Créée le 1955-01-01 (72 ans d'existence)",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "API Recherche d'entreprises (DINUM)",
+            "url": "https://recherche-entreprises.api.gouv.fr/search?q=552032534&page=1&per_page=10",
+            "collecte_le": "2026-07-03",
+            "licence": "Licence Ouverte 2.0",
+            "detail": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "financier",
+      "libelle": "Santé financière",
+      "points": 0,
+      "plafond": 30,
+      "signaux": [
+        {
+          "id": "financier.comptes",
+          "libelle": "Comptes annuels publiés",
+          "statut": "ok",
+          "valeur": "Dernier exercice publié : 2024 — CA 27 376 000 000 €   résultat net 0 €",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "API Recherche d'entreprises (DINUM) — ratios financiers INPI",
+            "url": "https://recherche-entreprises.api.gouv.fr/search?q=552032534&page=1&per_page=10",
+            "collecte_le": "2026-07-03",
+            "licence": "Licence Ouverte 2.0",
+            "detail": {
+              "finances": {
+                "2024": {
+                  "ca": 27376000000,
+                  "resultat_net": 0
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "procedures_collectives",
+      "libelle": "Procédures collectives et radiations",
+      "points": 0,
+      "plafond": 30,
+      "signaux": [
+        {
+          "id": "procedures.collectives",
+          "libelle": "Procédures collectives (BODACC)",
+          "statut": "ok",
+          "valeur": "Aucune procédure collective publiée au BODACC",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "BODACC — annonces commerciales (DILA)",
+            "url": "https://bodacc-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales/records?where=registre+like+%22552032534%22+and+familleavis_lib%3D%22Proc%C3%A9dures+collectives%22&order_by=dateparution+desc&limit=20",
+            "collecte_le": "2026-07-03",
+            "licence": "etalab-2.0",
+            "detail": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "sanctions_integrite",
+      "libelle": "Sanctions et intégrité",
+      "points": 0,
+      "plafond": 30,
+      "signaux": [
+        {
+          "id": "sanctions.gels_avoirs",
+          "libelle": "Registre national des gels des avoirs (DG Trésor)",
+          "statut": "ok",
+          "valeur": "Aucune correspondance ≥ 88 % sur 6 292 entrées contrôlées",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "gels_avoirs — Registre national des gels des avoirs (DG Trésor)",
+            "url": "https://gels-avoirs.dgtresor.gouv.fr/ApiPublic/api/v1/publication/derniere-publication-fichier-json",
+            "collecte_le": "2026-07-03 16:32:41.365780",
+            "licence": "Registre public DG Trésor",
+            "detail": null
+          }
+        },
+        {
+          "id": "sanctions.eu_fsf",
+          "libelle": "Sanctions financières de l'UE (liste consolidée FSF)",
+          "statut": "ok",
+          "valeur": "Aucune correspondance ≥ 88 % sur 24 472 entrées contrôlées",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "eu_fsf — Sanctions financières de l'UE (liste consolidée FSF)",
+            "url": "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
+            "collecte_le": "2026-07-03 16:32:44.725523",
+            "licence": "Commission européenne (FSF, réutilisation libre)",
+            "detail": null
+          }
+        },
+        {
+          "id": "sanctions.edes",
+          "libelle": "Exclusions du budget de l'UE (EDES)",
+          "statut": "ok",
+          "valeur": "Aucune correspondance ≥ 88 % sur 3 entrées contrôlées",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "edes — Exclusions du budget de l'UE (EDES)",
+            "url": "https://ec.europa.eu/edes/api/cases/paginatedList",
+            "collecte_le": "2026-07-03 16:32:45.263683",
+            "licence": "Commission européenne (liste publiée EDES)",
+            "detail": null
+          }
+        },
+        {
+          "id": "sanctions.os_worldbank_debarred",
+          "libelle": "Exclusions Banque mondiale (miroir OpenSanctions)",
+          "statut": "ok",
+          "valeur": "Aucune correspondance ≥ 88 % sur 1 415 entrées contrôlées",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "opensanctions — Exclusions Banque mondiale (miroir OpenSanctions)",
+            "url": "https://data.opensanctions.org/datasets/latest/worldbank_debarred/targets.simple.csv",
+            "collecte_le": "2026-07-03 16:32:45.951123",
+            "licence": "CC-BY-NC 4.0 (OpenSanctions — non commercial)",
+            "detail": null
+          }
+        },
+        {
+          "id": "sanctions.os_eu_edes",
+          "libelle": "Exclusions EDES (miroir OpenSanctions)",
+          "statut": "ok",
+          "valeur": "Aucune correspondance ≥ 88 % sur 3 entrées contrôlées",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "opensanctions — Exclusions EDES (miroir OpenSanctions)",
+            "url": "https://data.opensanctions.org/datasets/latest/eu_edes/targets.simple.csv",
+            "collecte_le": "2026-07-03 16:32:46.011431",
+            "licence": "CC-BY-NC 4.0 (OpenSanctions — non commercial)",
+            "detail": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "track_record",
+      "libelle": "Historique de marchés publics (DECP)",
+      "points": 0,
+      "plafond": 30,
+      "signaux": [
+        {
+          "id": "track_record.volume",
+          "libelle": "Historique de marchés publics",
+          "statut": "ok",
+          "valeur": "Aucun marché public recensé dans les DECP pour ce SIREN (première candidature possible — pas un risque en soi)",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "decp — DECP consolidées",
+            "url": "https://static.data.gouv.fr/resources/donnees-essentielles-de-la-commande-publique-consolidees-format-tabulaire/20260626-110512/decp.parquet",
+            "collecte_le": "2026-07-03 16:35:56.134307",
+            "licence": "Licence Ouverte 2.0 (DECP consolidées, decp.info)",
+            "detail": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "lobbying",
+      "libelle": "Liens d'intérêts (HATVP)",
+      "points": 0,
+      "plafond": 30,
+      "signaux": [
+        {
+          "id": "lobbying.hatvp",
+          "libelle": "Répertoire HATVP des représentants d'intérêts",
+          "statut": "declenche",
+          "valeur": "Inscrit au répertoire des représentants d'intérêts (Société commerciale et civile (autre que cabinet d’avocats et société de conseil)), dernière activité publiée le 2026-04-08. Élément de vigilance déontologique (pas un risque en soi) : vérifier l'absence de lien avec l'acheteur ou les élus concernés.",
+          "gravite": "info",
+          "points": 0,
+          "preuve": {
+            "source": "hatvp — répertoire HATVP via API Tricoteuses Parlement",
+            "url": "https://parlement.tricoteuses.fr/representantsInterets/json",
+            "collecte_le": "2026-07-03 16:33:19.972107",
+            "licence": "ODbL-1.0 (Tricoteuses / HATVP)",
+            "detail": {
+              "denomination": "DANONE"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "avertissements": [],
+  "genere_le": "2026-07-03T15:37:14+00:00",
+  "duree_ms": 2928
+}

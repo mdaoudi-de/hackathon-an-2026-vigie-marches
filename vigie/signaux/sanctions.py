@@ -55,6 +55,22 @@ def classer(similarite: float, pays: Optional[str] = None) -> Optional[str]:
     return zone
 
 
+def zone_correspondance(
+    sim_inclusion: float, sim_stricte: float, pays: Optional[str] = None
+) -> Optional[str]:
+    """Combine deux similarités : inclusion de tokens (token_set) et stricte (token_sort).
+
+    « ROSNEFT » doit matcher « ROSNEFT OIL COMPANY » (inclusion = 100) alors que
+    la comparaison stricte échoue (~54). Mais une correspondance PAR INCLUSION
+    SEULE est rétrogradée d'une zone : un nom court inclus dans un nom long
+    reste une piste, pas une quasi-identité.
+    """
+    zone = classer(sim_inclusion, pays)
+    if zone == "fort" and sim_stricte < bareme.SEUIL_MATCH_POSSIBLE:
+        zone = "possible"
+    return zone
+
+
 # ---------- Chargement des listes locales ----------
 
 # (table, requête -> [nom, pays, motif], cible du matching : 'pm' raison sociale / 'pp' personnes)
@@ -132,19 +148,21 @@ def _matcher(requete_norm: str, entries: list, cible: str) -> list[dict]:
     resultats = process.extract(
         requete_norm,
         choix,
-        scorer=fuzz.token_sort_ratio,
+        scorer=fuzz.token_set_ratio,  # tolère l'inclusion : « ROSNEFT » ⊂ « ROSNEFT OIL COMPANY »
         score_cutoff=bareme.SEUIL_MATCH_POSSIBLE,
         limit=5,
     )
     matches = []
-    for _, similarite, idx in resultats:
+    for nom_norm, sim_inclusion, idx in resultats:
         _, original, pays, motif, _ = metas[idx]
-        zone = classer(similarite, pays)
+        sim_stricte = fuzz.token_sort_ratio(requete_norm, nom_norm)
+        zone = zone_correspondance(sim_inclusion, sim_stricte, pays)
         if zone:
             matches.append(
                 {
                     "nom_liste": original,
-                    "similarite": round(similarite, 1),
+                    "similarite": round(sim_inclusion, 1),
+                    "similarite_stricte": round(sim_stricte, 1),
                     "zone": zone,
                     "pays": pays,
                     "motif": (str(motif)[:300] if motif else None),

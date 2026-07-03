@@ -37,6 +37,21 @@ def test_classer_zones_similarite():
     assert classer(97, pays="fr") == "fort"
 
 
+def test_zone_correspondance_inclusion():
+    from vigie.signaux.sanctions import zone_correspondance
+
+    # Quasi-identité stricte : zone forte conservée
+    assert zone_correspondance(100, 100) == "fort"
+    # Inclusion seule (« ROSNEFT » dans « ROSNEFT OIL COMPANY ») : rétrogradée à possible
+    assert zone_correspondance(100, 54) == "possible"
+    # Inclusion moyenne : reste possible
+    assert zone_correspondance(90, 54) == "possible"
+    # Sous le seuil : ignoré
+    assert zone_correspondance(80, 80) is None
+    # Cumul inclusion seule + pays éloigné : possible (pays) puis inchangé
+    assert zone_correspondance(100, 54, pays="cn") == "possible"
+
+
 def test_normaliser_identifiant():
     assert normaliser_identifiant("552 032 534") == ("552032534", None)
     assert normaliser_identifiant("75058171200015") == ("750581712", "75058171200015")

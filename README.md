@@ -17,7 +17,27 @@ Le dossier [hackathon-an-2026/](hackathon-an-2026/) suit la structure imposée p
 - [x] Scripts d'ingestion → base DuckDB locale avec table de provenance → [ingestion/](ingestion/)
 - [x] Feuille de route par runs → [docs/ROADMAP.md](docs/ROADMAP.md)
 - [x] **Run 1 — Moteur de score explicable** (6 familles de signaux, barème v1.0, CLI) → [vigie/](vigie/)
-- [ ] Run 2 — API FastAPI · Run 3 — Front Next.js · Run 4 — Rapport Claude · Run 5 — MCP maison · Run 6 — Polish
+- [x] **Run 2 — API REST FastAPI** (7 endpoints documentés, cache, mode hors-ligne) → [api/](api/)
+- [ ] Run 3 — Front Next.js · Run 4 — Rapport Claude · Run 5 — MCP maison · Run 6 — Polish
+
+## API REST (Run 2)
+
+```powershell
+.\.venv\Scripts\uvicorn api.main:app --reload      # doc interactive : http://127.0.0.1:8000/docs
+```
+
+| Endpoint | Rôle |
+|---|---|
+| `GET /api/analyses/{siren_ou_siret}` | **Analyse complète** (contrat JSON du moteur, cache 15 min) |
+| `GET /api/candidats?q=` | Autocomplétion (nom, SIREN, SIRET) |
+| `GET /api/screening/sanctions?nom=` | Screening d'un nom seul contre les 5 listes |
+| `GET /api/track-record/{id}` | Historique DECP + derniers marchés |
+| `GET /api/provenance` | Traçabilité des tables locales (source, date, licence) |
+| `GET /api/bareme` | Méthodologie du score (barème versionné) |
+| `GET /api/sante` | Healthcheck |
+
+Mode démo sans réseau : `VIGIE_OFFLINE=1` sert les analyses enregistrées des 3 cas de démo
+(régénérables via `python scripts/generer_fixtures.py`).
 
 ## Moteur d'analyse (Run 1)
 
