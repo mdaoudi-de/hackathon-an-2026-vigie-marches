@@ -6,7 +6,7 @@ Un outil open source qui assiste les acheteurs publics dans l'analyse des candid
 
 ### Porteur
 Mohamed Daoudi,
-Yann Skonieczny,
+Yann Skonieczny et
 Parfait Okito
 
 ### Description longue
