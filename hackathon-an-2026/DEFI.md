@@ -5,8 +5,8 @@ Vigie Marchés — IA et Open Data pour la transparence des marchés publics
 Un outil open source qui assiste les acheteurs publics dans l'analyse des candidatures aux marchés publics : agrégation automatique de sources Open Data, vérification de la conformité administrative, score de risque explicable et rapport d'aide à la décision — avec transparence et traçabilité de chaque signal.
 
 ### Porteur
-Mohamed Daoudi
-Yann Skonieczny
+Mohamed Daoudi,
+Yann Skonieczny,
 Parfait Okito
 
 ### Description longue
