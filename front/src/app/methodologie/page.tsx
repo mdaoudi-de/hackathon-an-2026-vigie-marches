@@ -2,6 +2,9 @@ import { getBareme, getProvenance } from "@/lib/api";
 
 export const metadata = { title: "Méthodologie — Vigie Marchés" };
 
+// Rendu à la requête (jamais au build) : l'API n'a pas à être disponible pendant `next build`.
+export const dynamic = "force-dynamic";
+
 export default async function Methodologie() {
   let bareme, provenance;
   try {

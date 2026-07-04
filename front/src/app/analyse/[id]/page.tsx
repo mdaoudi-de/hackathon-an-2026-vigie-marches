@@ -2,6 +2,9 @@ import Link from "next/link";
 import { Rapport } from "@/components/Rapport";
 import { getAnalyse, type Gravite, type Niveau, type Signal } from "@/lib/api";
 
+// Rendu à la requête (jamais au build) : l'API n'a pas à être disponible pendant `next build`.
+export const dynamic = "force-dynamic";
+
 const COULEURS_NIVEAU: Record<Niveau, { fond: string; texte: string; trait: string }> = {
   VERT: { fond: "bg-emerald-600", texte: "text-emerald-700", trait: "#059669" },
   ORANGE: { fond: "bg-amber-500", texte: "text-amber-700", trait: "#d97706" },

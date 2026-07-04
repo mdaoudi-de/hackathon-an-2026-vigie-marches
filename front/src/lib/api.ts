@@ -89,8 +89,15 @@ export interface ProvenanceLigne {
   note?: string | null;
 }
 
+// Deux contextes d'appel :
+//  - côté serveur (composants serveur Next, dans le conteneur) → API_URL_INTERNAL (ex. http://api:8000)
+//  - côté navigateur (autocomplétion, rapport) → NEXT_PUBLIC_API_URL (port publié, ex. http://localhost:8000)
+// En développement local (sans Docker), les deux retombent sur 127.0.0.1:8000.
+const cote_serveur = typeof window === "undefined";
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
+  (cote_serveur
+    ? process.env.API_URL_INTERNAL ?? process.env.NEXT_PUBLIC_API_URL
+    : process.env.NEXT_PUBLIC_API_URL) ?? "http://127.0.0.1:8000";
 
 async function getJson<T>(chemin: string): Promise<T> {
   const reponse = await fetch(`${API_URL}${chemin}`, { cache: "no-store" });

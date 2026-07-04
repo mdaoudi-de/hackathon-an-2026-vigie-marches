@@ -1,0 +1,8 @@
+# Dépendances de développement : tests + génération des livrables (slides, captures).
+# Non incluses dans l'image Docker de l'application.
+-r requirements.txt
+pytest>=8.2
+httpx>=0.27
+reportlab>=4.0
+pymupdf>=1.24
+playwright>=1.40

@@ -1,3 +1,5 @@
+# Dépendances d'exécution (moteur + ingestion + API + serveur MCP).
+# Outillage de dev et de génération des livrables : voir requirements-dev.txt
 requests>=2.31
 duckdb>=1.0
 tqdm>=4.66
@@ -5,11 +7,5 @@ pydantic>=2.7
 rapidfuzz>=3.9
 fastapi>=0.111
 uvicorn[standard]>=0.30
-pytest>=8.2
 anthropic>=0.40
 mcp[cli]>=1.2
-
-# Outils de génération des livrables (slides, captures) — facultatifs
-reportlab>=4.0
-pymupdf>=1.24
-playwright>=1.40

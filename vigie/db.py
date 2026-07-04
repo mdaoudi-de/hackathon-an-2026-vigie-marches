@@ -21,7 +21,14 @@ def connexion() -> Optional[duckdb.DuckDBPyConnection]:
     """Connexion read-only, ou None si la base n'a pas encore été ingérée."""
     if not config.DB_PATH.exists():
         return None
-    return duckdb.connect(str(config.DB_PATH), read_only=True)
+    conn = duckdb.connect(str(config.DB_PATH), read_only=True)
+    # Nécessaire si la table DECP est une vue distante (ingestion --decp-remote) :
+    # la lecture du Parquet distant passe par httpfs. Sans effet en mode local.
+    try:
+        conn.execute("INSTALL httpfs; LOAD httpfs;")
+    except Exception:
+        pass
+    return conn
 
 
 def provenance(conn: duckdb.DuckDBPyConnection, table: str) -> dict[str, Any]:

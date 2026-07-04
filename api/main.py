@@ -36,8 +36,12 @@ from vigie.modeles import Analyse
 from vigie.moteur import analyser, normaliser_identifiant
 from vigie.signaux import sanctions, track_record
 
-OFFLINE = os.environ.get("VIGIE_OFFLINE") == "1"
 FIXTURES = config.DATA_DIR / "fixtures"
+
+
+def _offline() -> bool:
+    """Lu à chaque requête (et pas seulement à l'import) pour rester testable."""
+    return os.environ.get("VIGIE_OFFLINE") == "1"
 
 app = FastAPI(
     title="Vigie Marchés — API",
@@ -71,7 +75,7 @@ def sante() -> Sante:
         conn.close()
     return Sante(
         statut="ok",
-        mode_offline=OFFLINE,
+        mode_offline=_offline(),
         base_locale=conn is not None,
         tables_ingerees=tables,
     )
@@ -123,7 +127,7 @@ def analyse(identifiant: str) -> Analyse:
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
-    if OFFLINE:
+    if _offline():
         fixture = FIXTURES / f"analyse_{chiffres}.json"
         if fixture.exists():
             return Analyse(**json.loads(fixture.read_text(encoding="utf-8")))

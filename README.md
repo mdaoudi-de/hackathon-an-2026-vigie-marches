@@ -64,6 +64,23 @@ Règle absolue : **aucun signal sans preuve** (source, URL, date, licence).
 
 ## Démarrage rapide
 
+### Option A — Docker (recommandé, tout-en-un)
+
+Prérequis : Docker Desktop. Une seule commande construit les images, ingère les données et démarre tout :
+
+```bash
+docker compose up --build
+#   Front  : http://localhost:3000
+#   API    : http://localhost:8000/docs
+```
+
+Le service `ingest` construit la base **une seule fois** dans un volume (relancer avec
+`FORCE_INGEST=1` pour rafraîchir). Par défaut, les DECP sont interrogées à distance (léger, rapide) ;
+pour une base 100 % locale, mettre `INGEST_ARGS=" "` dans `.env`. Si le port 3000 est déjà pris,
+`FRONT_PORT=3100 docker compose up --build`. Configuration : copier [`.env.example`](.env.example) en `.env`.
+
+### Option B — Local (développement)
+
 ```powershell
 # 1. Environnement Python + données (base DuckDB régénérable)
 python -m venv .venv
@@ -78,11 +95,11 @@ python -m venv .venv
 #   http://127.0.0.1:8000/docs                #   http://localhost:3000
 ```
 
-Démo **sans réseau** (jury) : lancer l'API avec `VIGIE_OFFLINE=1` — les 3 cas de démonstration
+Démo **sans réseau** (jury) : lancer l'API avec `VIGIE_OFFLINE=1` (ou dans `.env` pour Docker) — les 3 cas
 sont servis depuis `data/fixtures/` (régénérables via `python scripts/generer_fixtures.py`).
 
-Rapport IA (optionnel) : créer un fichier `.env` à la racine avec `ANTHROPIC_API_KEY=...`.
-Sans clé, tout fonctionne ; seul le bouton « Générer le rapport » renvoie un message explicite.
+Rapport IA (optionnel) : renseigner `ANTHROPIC_API_KEY` dans `.env`. Sans clé, tout fonctionne ;
+seul le bouton « Générer le rapport » renvoie un message explicite.
 
 ## Cas de démonstration (données réelles, [détail](data/fixtures/cas_demo.md))
 
@@ -126,9 +143,16 @@ hackathon-an-2026/   dossier réglementaire (DEFI.md, docs/, images/)
 ## Tests
 
 ```powershell
-.\.venv\Scripts\python -m pytest tests/ -q      # moteur (barème, matching, agrégation)
-.\scripts\test-sources.ps1                       # les sources répondent (14 vérifications)
+.\.venv\Scripts\pip install -r requirements-dev.txt
+.\.venv\Scripts\python -m pytest        # 32 tests, sans réseau ni base :
+#   test_moteur   — barème, matching sanctions, agrégation des niveaux (partie pure)
+#   test_imports  — tous les modules s'importent (dépendances complètes)
+#   test_api      — contrat de l'API en mode hors-ligne (fixtures des 3 cas)
+
+.\scripts\test-sources.ps1               # optionnel : les sources ouvertes répondent (14 vérifications, réseau requis)
 ```
+
+Les tests ne nécessitent ni réseau ni base ingérée : ils valident la reproductibilité sur un poste vierge.
 
 ## Licence
 

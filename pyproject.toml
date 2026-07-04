@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+# Rend la racine du dépôt importable : `pytest` fonctionne depuis n'importe quel poste.
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"

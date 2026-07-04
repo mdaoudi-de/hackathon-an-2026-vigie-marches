@@ -1,0 +1,64 @@
+# Reproduction complète du projet sur n'importe quelle machine :
+#
+#     docker compose up --build
+#
+# 1. `ingest`  construit la base data/vigie.duckdb dans un volume (une seule fois).
+# 2. `api`     sert l'API FastAPI sur http://localhost:8000 (dépend de l'ingestion réussie).
+# 3. `front`   sert l'interface Next.js sur http://localhost:3000.
+#
+# Variables (facultatives) : copier .env.example en .env. Voir ce fichier pour le détail.
+
+services:
+  ingest:
+    build: .
+    command: >
+      sh -c "if [ -f /app/data/vigie.duckdb ] && [ \"$$FORCE_INGEST\" != 1 ]; then
+               echo 'Base déjà présente — ingestion ignorée (FORCE_INGEST=1 pour forcer).';
+             else
+               python -m ingestion.ingest_all $$INGEST_ARGS;
+             fi"
+    environment:
+      # Défaut : --decp-remote (ingestion rapide et légère, DECP en vue distante).
+      # Pour une base 100 % locale/autonome : INGEST_ARGS=" " (une espace) dans .env.
+      INGEST_ARGS: ${INGEST_ARGS:---decp-remote}
+      FORCE_INGEST: ${FORCE_INGEST-0}
+    volumes:
+      - vigie-data:/app/data
+    restart: "no"
+
+  api:
+    build: .
+    depends_on:
+      ingest:
+        condition: service_completed_successfully
+    environment:
+      VIGIE_OFFLINE: ${VIGIE_OFFLINE-0}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY-}
+    volumes:
+      - vigie-data:/app/data
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/sante').status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  front:
+    build:
+      context: ./front
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL-http://localhost:8000}
+    depends_on:
+      - api
+    environment:
+      # URL de l'API dans le réseau Docker (appels côté serveur Next).
+      API_URL_INTERNAL: http://api:8000
+      PORT: 3000
+    # Port hôte configurable (FRONT_PORT dans .env) si 3000 est déjà pris par un autre projet.
+    ports:
+      - "${FRONT_PORT-3000}:3000"
+
+volumes:
+  vigie-data:
