@@ -1,157 +1,137 @@
-# Vigie Marchés — Hackathon AN 2026 · Transparence des marchés publics par l'IA et l'Open Data
+# Vigie Marchés
 
-Prototype **open source** d'aide aux acheteurs publics pour l'analyse des candidatures aux marchés publics :
-agrégation automatique de sources Open Data, vérification de conformité administrative, analyse de documents,
-**score de risque explicable**, tableaux de bord et **rapport d'aide à la décision** — avec transparence et traçabilité.
+**L'IA et l'Open Data au service de la transparence des marchés publics.**
+Prototype **open source** (hackathon de l'Assemblée nationale 2026) qui assiste les acheteurs
+publics dans l'analyse des candidatures : il agrège les données ouvertes, vérifie la conformité
+d'un candidat, produit un **score de risque explicable** et un **rapport d'aide à la décision** —
+avec, derrière chaque signal, sa source et sa date. *L'outil signale et source ; la décision reste humaine.*
 
-## Dossier réglementaire du hackathon
+![Fiche d'analyse](hackathon-an-2026/images/ecran-analyse-rouge.png)
 
-Le dossier [hackathon-an-2026/](hackathon-an-2026/) suit la structure imposée par l'organisation :
-- [DEFI.md](hackathon-an-2026/DEFI.md) — fiche du défi (template officiel) ; son contenu alimente la page publique du défi
-- `docs/` et `images/` — **tout document ou image référencé dans DEFI.md doit être placé dans ces deux dossiers**
+## Pourquoi
 
-## État du projet
+Vérifier un candidat impose aujourd'hui de consulter manuellement l'INPI, le BODACC, data.gouv,
+les listes de sanctions… C'est chronophage et difficile à maintenir. Et **il n'existe aucun
+registre public français des interdictions de soumissionner** (art. L2141 du Code de la commande
+publique) : la vérification repose largement sur la déclaration sur l'honneur. Vigie Marchés
+croise les signaux ouverts pour objectiver ce risque, sans se substituer au jugement de l'acheteur.
 
-- [x] Recensement et **vérification en conditions réelles** de ~80 endpoints / 30 sources (03/07/2026) → [docs/SOURCES.md](docs/SOURCES.md)
-- [x] Initialisation des serveurs MCP du projet → [.mcp.json](.mcp.json)
-- [x] Scripts d'ingestion → base DuckDB locale avec table de provenance → [ingestion/](ingestion/)
-- [x] Feuille de route par runs → [docs/ROADMAP.md](docs/ROADMAP.md)
-- [x] **Run 1 — Moteur de score explicable** (6 familles de signaux, barème v1.0, CLI) → [vigie/](vigie/)
-- [x] **Run 2 — API REST FastAPI** (7 endpoints documentés, cache, mode hors-ligne) → [api/](api/)
-- [x] **Run 3 — Interface Next.js** (recherche, fiche d'analyse avec preuves, méthodologie) → [front/](front/)
-- [x] **Run 4 — Rapport d'aide à la décision par Claude** (l'IA met en forme le JSON, ne calcule rien) → [vigie/rapport.py](vigie/rapport.py)
-- [x] **Run 5 — Serveur MCP maison `vigie-marches`** (5 outils agentiques) → [vigie_mcp/](vigie_mcp/)
-- [ ] Run 6 — Polish + livrables hackathon
+## Architecture
 
-## Rapport IA (Run 4)
+```
+                    SOURCES OUVERTES (vérifiées, datées, licenciées)
+   Recherche d'entreprises · BODACC · DECP (3,1 M) · Gels/UE/EDES/Banque mondiale · HATVP · Canutes
+                                        │
+              ┌─────────────────────────┼──────────────────────────┐
+              ▼                          ▼                          ▼
+      ingestion/ (batch)         clients.py (à la demande,     _provenance
+   → data/vigie.duckdb           par candidat)                 (traçabilité)
+              │                          │
+              └───────────┬──────────────┘
+                          ▼
+                 vigie/  — MOTEUR DÉTERMINISTE (aucune IA)
+        6 familles de signaux → barème v1.0 → Analyse JSON 100 % sourcée
+                          │
+        ┌─────────────────┼──────────────────┬────────────────────┐
+        ▼                 ▼                  ▼                    ▼
+   vigie/cli.py       api/ (FastAPI)     vigie_mcp/          vigie/rapport.py
+   ligne de           7 endpoints        serveur MCP         rapport rédigé
+   commande           REST + OpenAPI     5 outils agent.     par Claude*
+                          │
+                          ▼
+                    front/ (Next.js) — recherche, fiche d'analyse, méthodologie
 
-`GET /api/analyses/{id}/rapport` : Claude rédige une note d'aide à la décision (Markdown) à partir
-du **seul** JSON du moteur — le score est déjà figé, l'IA ne fait que la mise en forme sourcée
-(chaque fait cité `[BODACC]`, `[DECP]`…). Bouton « Générer le rapport » sur la fiche d'analyse.
-Nécessite une clé : créer un fichier `.env` à la racine avec `ANTHROPIC_API_KEY=...` (ignoré par git ;
-sans clé, l'app fonctionne, l'endpoint renvoie un 503 explicite). Modèle `claude-opus-4-8`, streaming.
-
-## Serveur MCP `vigie-marches` (Run 5) — le livrable différenciant
-
-Aucun serveur MCP DECP/BODACC n'existait : `vigie_mcp/serveur.py` (FastMCP, stdio) expose le **même
-moteur** en 5 outils pour un agent IA — `analyser_candidat`, `screening_sanctions`,
-`track_record_marches`, `rechercher_entreprise`, `sources_donnees`. Déclaré dans [.mcp.json](.mcp.json)
-(serveur `vigie`) à côté des 4 serveurs distants. Démo : dans Claude Code ouvert sur ce dossier,
-« Analyse la candidature de NEOLEDGE (SIRET 75058171200015), sanctions + historique, compare avec Danone ».
-
-## Interface web (Run 3)
-
-```powershell
-# Terminal 1 : l'API           # Terminal 2 : le front
-.\.venv\Scripts\uvicorn api.main:app        cd front; npm install; npm run dev
-# puis http://localhost:3000
+   * l'IA ne reçoit QUE le JSON du moteur : elle met en forme, ne calcule jamais le score.
 ```
 
-Trois écrans : **accueil** (recherche avec autocomplétion + 3 cas de démo cliquables),
-**fiche d'analyse** (pastille VERT/ORANGE/ROUGE, jauge, une carte par famille, chaque signal
-avec son lien « preuve » sourcé et daté), **méthodologie** (barème public + table de provenance).
+Le cœur `vigie/` est écrit une fois et réutilisé par la CLI, l'API, le serveur MCP et le rapport —
+un seul barème, un seul contrat JSON, une seule logique.
 
-## API REST (Run 2)
+## Les 6 familles de signaux
 
-```powershell
-.\.venv\Scripts\uvicorn api.main:app --reload      # doc interactive : http://127.0.0.1:8000/docs
-```
+| Famille | Source | Ce qu'elle détecte |
+|---|---|---|
+| Identité / conformité | Recherche d'entreprises | Existence, état cessé, ancienneté |
+| Santé financière | Recherche d'entreprises (INPI) | Comptes absents/anciens, résultat négatif, CA en baisse |
+| Procédures collectives | **BODACC** | Liquidation (rédhibitoire), redressement, radiation |
+| Sanctions / intégrité | Gels des avoirs, UE, EDES, Banque mondiale | Correspondance de nom → toujours « à vérifier » |
+| Historique de marchés | **DECP** (3,1 M) | Volume, montants, offre unique récurrente, concentration |
+| Liens d'intérêts | **HATVP** | Inscription au registre du lobbying (informatif) |
 
-| Endpoint | Rôle |
-|---|---|
-| `GET /api/analyses/{siren_ou_siret}` | **Analyse complète** (contrat JSON du moteur, cache 15 min) |
-| `GET /api/candidats?q=` | Autocomplétion (nom, SIREN, SIRET) |
-| `GET /api/screening/sanctions?nom=` | Screening d'un nom seul contre les 5 listes |
-| `GET /api/track-record/{id}` | Historique DECP + derniers marchés |
-| `GET /api/provenance` | Traçabilité des tables locales (source, date, licence) |
-| `GET /api/bareme` | Méthodologie du score (barème versionné) |
-| `GET /api/sante` | Healthcheck |
+Barème public et versionné (v1.0), aligné sur les interdictions de soumissionner : gravités
+`info`/`mineur`/`majeur`/`redhibitoire`, points plafonnés par famille, niveaux **VERT / ORANGE / ROUGE**.
+Règle absolue : **aucun signal sans preuve** (source, URL, date, licence).
 
-Mode démo sans réseau : `VIGIE_OFFLINE=1` sert les analyses enregistrées des 3 cas de démo
-(régénérables via `python scripts/generer_fixtures.py`).
-
-## Moteur d'analyse (Run 1)
+## Démarrage rapide
 
 ```powershell
-.\.venv\Scripts\python -m vigie.cli 552032534          # Danone : VERT, signal HATVP informatif
-.\.venv\Scripts\python -m vigie.cli 75058171200015     # NEOLEDGE : track-record DECP (74 marchés)
-.\.venv\Scripts\python -m vigie.cli 827879610          # DAVEO : ROUGE rédhibitoire (liquidation BODACC)
-.\.venv\Scripts\python -m vigie.cli 552032534 --json   # contrat JSON complet (API/front/MCP)
-.\.venv\Scripts\python -m pytest tests/ -q             # tests de la partie pure
-```
-
-Principes : score **déterministe et explicable** (aucune IA dans le calcul), barème versionné aligné
-sur les interdictions de soumissionner (art. L2141 CCP), **aucun signal sans preuve** (source, URL,
-date, licence), correspondances sanctions toujours « à vérifier » (jamais de rouge automatique sur
-un matching de nom). Cas de démo documentés dans [data/fixtures/cas_demo.md](data/fixtures/cas_demo.md).
-
-## Ingestion des données
-
-```powershell
+# 1. Environnement Python + données (base DuckDB régénérable)
 python -m venv .venv
 .\.venv\Scripts\pip install -r requirements.txt
+.\.venv\Scripts\python -m ingestion.ingest_all --decp-remote   # ~3 min, rien de lourd à télécharger
 
-# Tout ingérer (DECP en vue distante = démarrage rapide, rien à télécharger)
-.\.venv\Scripts\python -m ingestion.ingest_all --decp-remote
+# 2. Le moteur en CLI (démonstration immédiate, sans serveur)
+.\.venv\Scripts\python -m vigie.cli 827879610                   # DAVEO : ROUGE rédhibitoire
 
-# Ou en matérialisant les 3,1M de marchés DECP en local (~200 Mo, requêtes instantanées)
-.\.venv\Scripts\python -m ingestion.ingest_all
-
-# À la carte
-.\.venv\Scripts\python -m ingestion.ingest_all --only gels_avoirs edes
+# 3. L'API   (terminal 1)                    # 4. Le front (terminal 2)
+.\.venv\Scripts\uvicorn api.main:app          cd front ; npm install ; npm run dev
+#   http://127.0.0.1:8000/docs                #   http://localhost:3000
 ```
 
-Résultat : une base **`data/vigie.duckdb`** avec :
+Démo **sans réseau** (jury) : lancer l'API avec `VIGIE_OFFLINE=1` — les 3 cas de démonstration
+sont servis depuis `data/fixtures/` (régénérables via `python scripts/generer_fixtures.py`).
 
-| Table / vue | Contenu | Lignes (03/07/2026) |
+Rapport IA (optionnel) : créer un fichier `.env` à la racine avec `ANTHROPIC_API_KEY=...`.
+Sans clé, tout fonctionne ; seul le bouton « Générer le rapport » renvoie un message explicite.
+
+## Cas de démonstration (données réelles, [détail](data/fixtures/cas_demo.md))
+
+| Identifiant | Résultat | Intérêt |
 |---|---|---|
-| `gels_avoirs` | Registre national des gels des avoirs (DG Trésor) | 6 292 |
-| `eu_fsf` | Sanctions financières UE (liste consolidée) | 42 347 |
-| `edes` + `os_eu_edes` | Exclusions du budget UE | 3 |
-| `os_worldbank_debarred` | Exclusions Banque mondiale (+ cross-debarment) | 1 415 |
-| `hatvp_representants` / `v_lobbying` | Répertoire HATVP des représentants d'intérêts (3 718 SIREN joignables) | 4 038 |
-| `acheteurs_locaux` / `v_acheteurs` | Annuaire des acheteurs publics locaux (SIREN/SIRET, géoloc) | 37 400 |
-| `communes` | Communes (référentiel partiel Canutes) | 7 504 |
-| `decp` + `v_decp_stats_titulaire` | 3,1M de marchés publics, agrégés par titulaire | 3 101 841 |
-| `_provenance` | **Traçabilité** : source, URL, date de collecte, licence de chaque table | — |
+| `552032534` (DANONE) | 🟢 VERT | Saine, mais détectée au registre HATVP du lobbying |
+| `75058171200015` (NEOLEDGE) | 🟢 VERT | 74 marchés publics restitués en une requête (DECP) |
+| `827879610` (DAVEO) | 🔴 ROUGE | « Active » au répertoire, mais en liquidation au BODACC |
 
-Les fichiers bruts téléchargés sont conservés dans `data/raw/` (auditabilité).
-Les APIs à interroger **par candidat** au moment de l'analyse (recherche-entreprises, BODACC,
-DECP tabulaire, BOAMP, TED) sont disponibles dans [ingestion/clients.py](ingestion/clients.py).
+## Serveurs MCP
 
-## Serveurs MCP configurés (aucune clé requise)
+[.mcp.json](.mcp.json) déclare 5 serveurs : notre serveur maison **`vigie`** (5 outils exposant
+le moteur à un agent IA — `analyser_candidat`, `screening_sanctions`, `track_record_marches`,
+`rechercher_entreprise`, `sources_donnees`) + 4 serveurs distants sans clé (Parlement/Tricoteuses,
+data.gouv, JusticeLibre, service-public). Aucun serveur MCP dédié aux marchés publics n'existait.
 
-Le fichier [.mcp.json](.mcp.json) est chargé automatiquement par Claude Code à l'ouverture du projet
-(approuver les serveurs à la première utilisation) :
+## Structure du dépôt
 
-| Serveur | Rôle dans le projet |
-|---|---|
-| `parlement` (tricoteuses.fr) | HATVP : registre des représentants d'intérêts (avec SIREN), déclarations d'intérêts → détection de liens/conflits d'intérêts |
-| `datagouv` (officiel) | Recherche de datasets + requêtage direct du contenu (DECP 3,1M de marchés par SIRET via l'API tabulaire) |
-| `justicelibre` | ~3M décisions de justice + textes consolidés (Code de la commande publique) sans clé |
-| `service-public` | Avis BOAMP, annuaire des administrations |
+```
+vigie/          cœur : modeles, bareme, db, signaux/, moteur, cli, rapport
+api/            FastAPI : main, schemas, cache
+front/          Next.js : recherche, fiche d'analyse, méthodologie
+vigie_mcp/      serveur MCP (FastMCP, stdio)
+ingestion/      collecte Open Data → data/vigie.duckdb (+ clients à la demande)
+scripts/        fixtures, slides, captures, smoke test
+tests/          tests unitaires du moteur (partie pure, sans réseau)
+docs/           SOURCES.md (inventaire vérifié), ROADMAP.md
+hackathon-an-2026/   dossier réglementaire (DEFI.md, docs/, images/)
+```
 
-Vérifier la connexion : `claude mcp list` (ou `/mcp` dans une session Claude Code ouverte dans ce dossier).
+## Limites connues (assumées)
 
-## Stack de données du prototype (100 % sans authentification)
+- **Homonymies sur les sanctions** : matching de noms, jamais de SIREN sur ces listes → statut
+  « à vérifier » systématique, similarité et source affichées. L'outil ne conclut pas.
+- **Qualité des DECP** : données déclaratives ; les anomalies ne sont évaluées qu'à partir de
+  5 marchés, montants et taux affichés avec réserve.
+- **Trous de données** : un compte non publié est « indisponible » (0 point, mais visible), pas « OK ».
+- **Licence des données** : les miroirs OpenSanctions sont en CC-BY-NC 4.0 (usage non commercial) ;
+  un déploiement commercial utiliserait les sources primaires libres (DG Trésor, UE, EDES).
 
-1. **Identité & finances du candidat** — API Recherche d'entreprises (`recherche-entreprises.api.gouv.fr`)
-2. **Procédures collectives, radiations, dépôts de comptes** — BODACC (Opendatasoft DILA)
-3. **Track-record marchés publics par SIRET** — DECP via API tabulaire data.gouv.fr (+ Parquet quotidien pour le batch)
-4. **Avis et attributions** — BOAMP ; marchés européens — TED (POST sans clé)
-5. **Sanctions & intégrité** — Gels des avoirs (DG Trésor), EU FSF, EDES, miroirs OpenSanctions (Banque mondiale…)
-6. **Liens d'intérêts** — HATVP via l'API Tricoteuses Parlement
-7. **Acheteurs locaux (SIREN/SIRET, contacts)** — Canutes PostgREST (`db.code4code.eu/canutes`)
-
-Comptes gratuits à créer en avance (facultatif mais recommandé) : INPI RNE (comptes annuels PDF),
-INSEE Sirene (source certifiée), Pappers (100 jetons), PISTE (Légifrance officiel — activation en plusieurs jours).
-
-Détails complets, exemples de requêtes testées, limites, licences et pièges : **[docs/SOURCES.md](docs/SOURCES.md)**.
-
-## Tester les sources
+## Tests
 
 ```powershell
-./scripts/test-sources.ps1
+.\.venv\Scripts\python -m pytest tests/ -q      # moteur (barème, matching, agrégation)
+.\scripts\test-sources.ps1                       # les sources répondent (14 vérifications)
 ```
 
-Le script vérifie en ~30 s que les 4 serveurs MCP et les principales APIs répondent.
+## Licence
+
+Code sous licence [MIT](LICENSE). Données open data sous leurs licences respectives (créditées
+dans le fichier LICENSE et sur la page Méthodologie). *Prototype de hackathon — la décision
+d'admission ou d'exclusion d'un candidat appartient à l'acheteur public.*

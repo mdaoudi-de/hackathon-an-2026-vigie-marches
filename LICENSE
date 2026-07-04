@@ -1,0 +1,39 @@
+MIT License
+
+Copyright (c) 2026 Vigie Marchés — Hackathon Assemblée nationale 2026
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+NOTE SUR LES DONNÉES (distinctes du code, sous MIT ci-dessus) :
+
+Ce logiciel agrège des données ouvertes soumises à leurs propres licences,
+à créditer en cas de réutilisation :
+- Données du Parlement / HATVP (via Tricoteuses) : ODbL-1.0
+- Annuaire de l'administration (Canutes / code4code.eu) : © DILA
+- BOAMP, BODACC : Licence Ouverte / etalab-2.0
+- DECP (données essentielles de la commande publique) : Licence Ouverte 2.0
+- Registre des gels des avoirs (DG Trésor), EU FSF, EDES : réutilisation libre
+- Miroirs OpenSanctions (Banque mondiale, EDES) : CC-BY-NC 4.0
+
+⚠️ Les données OpenSanctions sont sous licence CC-BY-NC 4.0 (usage NON commercial).
+Elles conviennent à ce prototype ; un déploiement commercial devrait obtenir une
+licence OpenSanctions ou se limiter aux sources primaires officielles (gels-avoirs
+DG Trésor, EU FSF, EDES), qui sont librement réutilisables.
