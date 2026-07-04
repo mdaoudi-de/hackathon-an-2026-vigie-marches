@@ -6,3 +6,5 @@ rapidfuzz>=3.9
 fastapi>=0.111
 uvicorn[standard]>=0.30
 pytest>=8.2
+anthropic>=0.40
+mcp[cli]>=1.2

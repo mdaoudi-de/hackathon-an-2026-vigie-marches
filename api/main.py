@@ -142,6 +142,33 @@ def analyse(identifiant: str) -> Analyse:
 
 
 @app.get(
+    "/api/analyses/{identifiant}/rapport",
+    summary="Rapport d'aide à la décision rédigé par Claude",
+    description="L'IA ne calcule rien : elle reçoit uniquement le JSON du moteur (score figé) "
+    "et le met en forme en citant la source de chaque fait. Nécessite ANTHROPIC_API_KEY "
+    "(fichier .env à la racine). Mise en cache 15 min.",
+)
+def rapport(identifiant: str) -> dict:
+    from vigie.rapport import ClefApiManquante, generer_rapport
+
+    chiffres = re.sub(r"\D", "", identifiant)
+    cle_cache = f"rapport:{chiffres}"
+    en_cache = cache_analyses.get(cle_cache)
+    if en_cache is not None:
+        return en_cache
+
+    resultat_analyse = analyse(identifiant)  # réutilise cache/offline/422 de l'endpoint principal
+    try:
+        resultat = generer_rapport(resultat_analyse)
+    except ClefApiManquante as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Génération du rapport impossible : {e}")
+    cache_analyses.set(cle_cache, resultat)
+    return resultat
+
+
+@app.get(
     "/api/screening/sanctions",
     response_model=ScreeningReponse,
     summary="Screening d'un nom contre les 5 listes de sanctions/exclusions",

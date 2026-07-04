@@ -18,7 +18,38 @@ Le dossier [hackathon-an-2026/](hackathon-an-2026/) suit la structure imposée p
 - [x] Feuille de route par runs → [docs/ROADMAP.md](docs/ROADMAP.md)
 - [x] **Run 1 — Moteur de score explicable** (6 familles de signaux, barème v1.0, CLI) → [vigie/](vigie/)
 - [x] **Run 2 — API REST FastAPI** (7 endpoints documentés, cache, mode hors-ligne) → [api/](api/)
-- [ ] Run 3 — Front Next.js · Run 4 — Rapport Claude · Run 5 — MCP maison · Run 6 — Polish
+- [x] **Run 3 — Interface Next.js** (recherche, fiche d'analyse avec preuves, méthodologie) → [front/](front/)
+- [x] **Run 4 — Rapport d'aide à la décision par Claude** (l'IA met en forme le JSON, ne calcule rien) → [vigie/rapport.py](vigie/rapport.py)
+- [x] **Run 5 — Serveur MCP maison `vigie-marches`** (5 outils agentiques) → [vigie_mcp/](vigie_mcp/)
+- [ ] Run 6 — Polish + livrables hackathon
+
+## Rapport IA (Run 4)
+
+`GET /api/analyses/{id}/rapport` : Claude rédige une note d'aide à la décision (Markdown) à partir
+du **seul** JSON du moteur — le score est déjà figé, l'IA ne fait que la mise en forme sourcée
+(chaque fait cité `[BODACC]`, `[DECP]`…). Bouton « Générer le rapport » sur la fiche d'analyse.
+Nécessite une clé : créer un fichier `.env` à la racine avec `ANTHROPIC_API_KEY=...` (ignoré par git ;
+sans clé, l'app fonctionne, l'endpoint renvoie un 503 explicite). Modèle `claude-opus-4-8`, streaming.
+
+## Serveur MCP `vigie-marches` (Run 5) — le livrable différenciant
+
+Aucun serveur MCP DECP/BODACC n'existait : `vigie_mcp/serveur.py` (FastMCP, stdio) expose le **même
+moteur** en 5 outils pour un agent IA — `analyser_candidat`, `screening_sanctions`,
+`track_record_marches`, `rechercher_entreprise`, `sources_donnees`. Déclaré dans [.mcp.json](.mcp.json)
+(serveur `vigie`) à côté des 4 serveurs distants. Démo : dans Claude Code ouvert sur ce dossier,
+« Analyse la candidature de NEOLEDGE (SIRET 75058171200015), sanctions + historique, compare avec Danone ».
+
+## Interface web (Run 3)
+
+```powershell
+# Terminal 1 : l'API           # Terminal 2 : le front
+.\.venv\Scripts\uvicorn api.main:app        cd front; npm install; npm run dev
+# puis http://localhost:3000
+```
+
+Trois écrans : **accueil** (recherche avec autocomplétion + 3 cas de démo cliquables),
+**fiche d'analyse** (pastille VERT/ORANGE/ROUGE, jauge, une carte par famille, chaque signal
+avec son lien « preuve » sourcé et daté), **méthodologie** (barème public + table de provenance).
 
 ## API REST (Run 2)
 
