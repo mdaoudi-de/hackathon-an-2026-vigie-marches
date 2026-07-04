@@ -61,13 +61,18 @@ Cochez les ressources utilisées en remplaçant `[ ]` par `[x]`.
 - [x] `legiwatch-serveur-mcp-parlement` — Serveur MCP Parlement ✺ LegiWatch
 
 ### Galerie
-- [Aperçu](images/cover.png)
+- [Écran d'accueil — recherche et cas de démonstration](images/ecran-accueil.png)
+- [Fiche d'analyse — cas ROUGE (DAVEO en liquidation), chaque signal sourcé](images/ecran-analyse-rouge.png)
+- [Page méthodologie — barème public et provenance des données](images/ecran-methodologie.png)
+- [Serveur MCP « vigie-marches » — l'analyse exposée en outils agentiques](images/ecran-mcp.png)
 
 ### Documents
 - [Inventaire des sources Open Data vérifiées](docs/sources-verifiees.md)
+- [Script de présentation (pitch 3 minutes)](docs/pitch.md)
 
 ### URL de démonstration
-À venir
+Démonstration locale (le dépôt est autonome) — voir le démarrage rapide du README.
+Le jeu de démonstration hors-ligne (`VIGIE_OFFLINE=1`) permet de présenter les 3 cas sans réseau.
 
 ### Diapositives de présentation
-À venir
+[Diapositives de présentation](docs/diapositives.pdf)
