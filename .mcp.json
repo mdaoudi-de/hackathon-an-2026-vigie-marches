@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "vigie": {
+      "command": ".venv/Scripts/python.exe",
+      "args": ["-m", "vigie_mcp.serveur"]
+    },
     "parlement": {
       "type": "http",
       "url": "https://parlement.tricoteuses.fr/mcp"
